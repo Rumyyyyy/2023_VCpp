@@ -1,37 +1,39 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <stdlib.h>
 #include <conio.h>
+#include <windows.h>
+#define ESC 27
 
 int main() {
+	char command;
 	printf("김아름의 행복한 VC++");
-	char i;
+	Sleep(3000);
+	system("cls");
+	
 
-	printf("알파벳을 입력해주세요. (p, f, j)\n");
+	printf("알파벳을 입력해주세요. (q, w, e, r)\n");
 	while (1)
 	{
-		printf("command> ");
-		scanf(" %c", &i);
-		if (i == 'q') {
+		printf("\ncommand>");
+		command = _getch();
+		if (command == ESC) {
+			printf("프로그램이 종료되었습니다.");
+			break;
+		}
+		else if (command == 'q') {
 			printf("qwer 행복해");
-			break;
 		}
-		else if (i == 'w') {
+		else if (command == 'w') {
 			printf("과제 너무 좋다");
-			break;
 		}
-		else if (i == 'e') {
+		else if (command == 'e') {
 			printf("다음부턴 과제량 3배다");
-			break;
 		}
-		else if (i == 'r') {
+		else if (command == 'r') {
 			printf("안 행복해요 교수님 ㅠㅠ");
-			break;
 		}
 		else {
 			printf("다시 입력하세요.(q, w, e, r)\n");
-			scanf("%c", &i);
-			continue;
 		}
 	}
 }
