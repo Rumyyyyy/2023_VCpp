@@ -1,5 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
 
 int main() {
 	printf("김아름의 행복한 VC++");
