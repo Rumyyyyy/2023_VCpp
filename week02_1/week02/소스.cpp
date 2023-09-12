@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-	printf("202218016\n김아름님의\nApplication");
+	printf("김아름의 행복한 VC++");
 	char i;
 
 	printf("알파벳을 입력해주세요. (p, f, j)\n");
@@ -10,20 +10,25 @@ int main() {
 	{
 		printf("command> ");
 		scanf(" %c", &i);
-		if (i == 'p') {
-			printf("나는 과제를 겁나 잘하는 학생이다.");
+		if (i == 'q') {
+			printf("qwer 행복해");
 			break;
 		}
-		else if (i == 'f') {
-			printf("나는 과제가 너무 즐겁다.");
+		else if (i == 'w') {
+			printf("과제 너무 좋다");
 			break;
 		}
-		else if (i == 'j') {
-			printf("교수님 과제 더 내주세요.");
+		else if (i == 'e') {
+			printf("다음부턴 과제량 3배다");
+			break;
+		}
+		else if (i == 'r') {
+			printf("안 행복해요 교수님 ㅠㅠ");
 			break;
 		}
 		else {
-			printf("다시 입력하세요.(p, f, j)\n");
+			printf("다시 입력하세요.(q, w, e, r)\n");
+			scanf("%c", &i);
 			continue;
 		}
 	}
