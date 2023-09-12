@@ -6,7 +6,7 @@
 
 int main() {
 	char command;
-	printf("김아름의 행복한 VC++");
+	printf("김아름의 행복한 VC++\n");
 	Sleep(3000);
 	system("cls");
 	
