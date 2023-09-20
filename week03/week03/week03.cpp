@@ -1,37 +1,33 @@
 ﻿#include <iostream>
-#include <vector>
-#include <chrono>
-#include <thread>
-#include <conio.h>
+#include <conio.h> // _kbhit와 _getch 함수를 사용하기 위한 헤더 파일
 
 int main() {
-    std::vector<char> inputBuffer;
+    std::cout << "대전액션 커맨드" << std::endl;
+    std::string inputBuffer;
 
-    while (true) {
-        if (_kbhit()) {
-            char ch = _getch();
-            inputBuffer.push_back(ch);
+    while (true) { // 무한 루프, 프로그램이 종료될 때까지 계속 반복
+        if (_kbhit()) { // _kbhit 함수는 키 입력이 있는지 확인하는 함수
+            char ch = _getch(); // _getch 함수는 키 입력을 받는 함수
+            inputBuffer += ch; // 입력된 키를 버퍼에 추가
 
-            if (ch == 27) { // 27은 'esc' 키의 ASCII 코드입니다.
-                std::cout << "프로그램 종료!" << std::endl;
-                break; // 루프 종료
+            if (ch == 27) { // esc 키의 아스키 코드 => 27
+                return 0; // 프로그램 전체 종료
             }
         }
 
-        if (inputBuffer.size() >= 3) {
-            // 입력이 쌓였고, 패턴을 확인
-            if (inputBuffer[0] == '2' && inputBuffer[2] == '6' && inputBuffer[3] == 'a') {
-                std::cout << "아도겐! =o" << std::endl;
-                inputBuffer.clear(); // 입력 버퍼 비우기
-            }
-            else {
-                std::cout << "잘못된 입력" << std::endl;
-                inputBuffer.clear(); // 잘못된 입력을 처리하고 버퍼 비우기
-            }
+        if (inputBuffer.find("26a") != std::string::npos) { // 26a가 포함되어 있는지 확인
+            std::cout << "아도겐! =o" << std::endl;
+            break; // 프로그램 종료
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(300)); // 0.3초(300ms) 대기
+        else if (inputBuffer.find("24a") != std::string::npos) { // 24a가 포함되어 있는지 확인
+            std::cout << "뿅! =o" << std::endl;
+            break; // 프로그램 종료
+        }
+        else if (inputBuffer.find("28a") != std::string::npos) { // 28a가 포함되어 있는지 확인
+            std::cout << "짠! =o" << std::endl;
+            break; // 프로그램 종료
+        }
     }
 
-    return 0;
+    return 0; // 프로그램 종료
 }
