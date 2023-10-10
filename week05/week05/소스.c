@@ -108,9 +108,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     hwnd = CreateWindow(
         wc.lpszClassName,
         TEXT("202218016 김아름"),
-        WS_OVERLAPPED,
+        WS_OVERLAPPED, // 윈도우 창 고정
         0, 0,
-        windowWidth, windowHeight, // 창의 크기를 고정
+        windowWidth, windowHeight, // 창의 크기
         NULL, NULL,
         hInstance,
         NULL
