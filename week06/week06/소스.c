@@ -25,8 +25,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN: // 키를 누르면 색이 채워짐
 		if (wParam == VK_LEFT)
 		{
-			isMouseLButtonPressed = 1;
 			hBrush = CreateSolidBrush(RGB(255, 0, 255)); // 핑크 브러시 생성
+			isMouseLButtonPressed = 1;
+			if (wParam == VK_RIGHT) {
+				rect_user.left += 5;
+				rect_user.right += 5;
+				InvalidateRect(hwnd, NULL, TRUE);
+			}
+			// hBrush = CreateSolidBrush(RGB(255, 0, 255)); // 핑크 브러시 생성
+			// rect_user.left += 1;
+			// rect_user.right += 1;
 			do {
 				
 			} while (1);
@@ -55,8 +63,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//FillRect(hdc, &rect_user, hBrush_eraser);
 			//FillRect(hdc, &rect_target, hBrush_eraser);
 		}
-
-
 	}
 	break;
 	case WM_CLOSE:
