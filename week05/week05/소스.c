@@ -1,3 +1,8 @@
+/*
+ 사각형 가운데에서 우클릭을 하면 그 위치를 확인하여 사각형 이내에 있는 곳이면 옮기는 걸로 인식 해야함
+ 원래 있는 사각형의 좌표와 새로 옮길 좌표를 계산하여 옮겨야함
+ (A, B) (a, b) 를 이용해 그 사이에 들어가는 (x, y) 좌표가 우클릭되면 미리 그려둔 사각형을 옮길 수 있도록
+*/
 #ifdef UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 #else
@@ -15,7 +20,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_CREATE:
-        pinkBrush = CreateSolidBrush(RGB(255, 182, 193)); // 핑크색 브러시 생성
+        pinkBrush = CreateSolidBrush(RGB(255, 0, 255)); // 핑크색 브러시 생성
         break;
 
     case WM_DESTROY:
