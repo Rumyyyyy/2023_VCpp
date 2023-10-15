@@ -8,7 +8,7 @@ int blueRectHeight = 50; // 파란색 사각형의 높이
 
 int textX; // 텍스트의 X 좌표
 int textY; // 텍스트의 Y 좌표
-BOOL showText = TRUE; // 텍스트를 표시할지 여부를 나타내는 변수
+BOOL showText = FALSE; // 첫 윈도우 화면에서 텍스트 숨김
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -71,10 +71,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         RECT blueRect = { blueRectX, blueRectY, blueRectX + blueRectWidth, blueRectY + blueRectHeight };
         RECT pinkRect = { 50, 50, 150, 150 };
         if (IntersectRect(&blueRect, &blueRect, &pinkRect)) {
-            showText = FALSE; // 충돌 시 텍스트 숨김
+            showText = TRUE; // 충돌 시 텍스트 표시
         }
         else {
-            showText = TRUE; // 충돌이 없을 때 텍스트 표시
+            showText = FALSE; // 충돌이 없을 때 텍스트 숨김
         }
 
         // 윈도우를 다시 그리도록 요청
