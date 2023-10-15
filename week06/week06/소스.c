@@ -1,169 +1,117 @@
-#ifdef UNICODE
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-#else
-#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
-#endif
-
 #include <windows.h>
 
-POINT startPoint = { 0 };
-POINT endPoint = { 0 };
-int isMouseLButtonPressed = 0;
+// 전역 변수로 사각형의 위치와 크기를 저장
+int blueRectX;
+int blueRectY;
+int blueRectWidth = 50; // 파란색 사각형의 너비
+int blueRectHeight = 50; // 파란색 사각형의 높이
 
-// 윈도우의 이벤트를 처리하는 콜백(Callback) 함수.
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	HDC hdc = GetDC(hwnd);
-	RECT rect_target = { 50, 50, 150, 150 }; // 왼쪽 상단 좌표 (50, 50)에서 오른쪽 하단 좌표 (150, 150)까지의 사각형
-	RECT rect_user = { 50, 50, 10, 10 }; // 왼쪽 상단 좌표 (50, 50)에서 오른쪽 하단 좌표 (10, 10)까지의 사각형
-	HBRUSH hBrush_user = CreateSolidBrush(RGB(255, 0, 255));
-	HBRUSH hBrush_target = CreateSolidBrush(RGB(255, 0, 0));
-	HBRUSH hBrush_eraser = CreateSolidBrush(RGB(255, 255, 255));
-	HBRUSH hBrush;
-	switch (uMsg)
-	{
-	case WM_KEYDOWN: // 키를 누르면 색이 채워짐
-		if (wParam == VK_LEFT)
-		{
-			hBrush = CreateSolidBrush(RGB(255, 0, 255)); // 핑크 브러시 생성
-			isMouseLButtonPressed = 1;
-			if (wParam == VK_RIGHT) {
-				rect_user.left += 5;
-				rect_user.right += 5;
-				InvalidateRect(hwnd, NULL, TRUE);
-			}
-			// hBrush = CreateSolidBrush(RGB(255, 0, 255)); // 핑크 브러시 생성
-			// rect_user.left += 1;
-			// rect_user.right += 1;
-			do {
-				
-			} while (1);
-			// 그리기
-			FillRect(hdc, &rect_target, hBrush); // 사각형을 빨간색으로 채우기		
-		}
-		break;
-	case WM_KEYUP:
-		if (wParam == VK_LEFT)
-		{
-			isMouseLButtonPressed = 0;
+int textX; // 텍스트의 X 좌표
+int textY; // 텍스트의 Y 좌표
+BOOL showText = TRUE; // 텍스트를 표시할지 여부를 나타내는 변수
 
-			hBrush = CreateSolidBrush(RGB(255, 255, 255));
-			// 그리기
-			FillRect(hdc, &rect_target, hBrush);
-		}
-		break;
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        return 0;
+    case WM_PAINT: {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hwnd, &ps);
 
-	case WM_PAINT:
-	{
-		if (isMouseLButtonPressed) {
-			FillRect(hdc, &rect_user, hBrush_user);
-			FillRect(hdc, &rect_target, hBrush_target);
-		}
-		else {
-			//FillRect(hdc, &rect_user, hBrush_eraser);
-			//FillRect(hdc, &rect_target, hBrush_eraser);
-		}
-	}
-	break;
-	case WM_CLOSE:
-		PostQuitMessage(0);
-		DestroyWindow(hwnd);
+        // 화면을 흰색으로 클리어
+        HBRUSH whiteBrush = CreateSolidBrush(RGB(255, 255, 255)); // 흰색
+        FillRect(hdc, &ps.rcPaint, whiteBrush);
+        DeleteObject(whiteBrush);
 
-		break;
-	default:
-		return DefWindowProc(hwnd, uMsg, wParam, lParam);
-	}
+        // 핑크 사각형 그리기
+        RECT pinkRect = { 50, 50, 150, 150 };
+        HBRUSH pinkBrush = CreateSolidBrush(RGB(255, 192, 203)); // 핑크색
+        FillRect(hdc, &pinkRect, pinkBrush);
+        DeleteObject(pinkBrush);
 
-	DeleteObject(hBrush_user);
-	DeleteObject(hBrush_target);
-	DeleteObject(hBrush_eraser);
-	ReleaseDC(hwnd, hdc);
+        // 파란색 사각형 그리기
+        RECT blueRect = { blueRectX, blueRectY, blueRectX + blueRectWidth, blueRectY + blueRectHeight };
+        HBRUSH blueBrush = CreateSolidBrush(RGB(0, 0, 255)); // 파란색
+        FillRect(hdc, &blueRect, blueBrush);
+        DeleteObject(blueBrush);
 
-	return S_OK;
+        if (showText) {
+            // 텍스트 출력을 화면 중앙에 배치
+            RECT textRect;
+            GetClientRect(hwnd, &textRect); // 윈도우 클라이언트 영역 크기를 가져옴
+            int textWidth = 100; // 텍스트 너비
+            int textHeight = 20; // 텍스트 높이
+            textX = (textRect.right - textRect.left - textWidth) / 2;
+            textY = (textRect.bottom - textRect.top - textHeight) / 2;
+            TextOut(hdc, textX, textY, L"HIT !", 5);
+        }
+
+        EndPaint(hwnd, &ps);
+        return 0;
+    }
+    case WM_KEYDOWN: {
+        int stepSize = 10;
+        switch (wParam) {
+        case VK_LEFT:
+            blueRectX -= stepSize;
+            break;
+        case VK_RIGHT:
+            blueRectX += stepSize;
+            break;
+        case VK_UP:
+            blueRectY -= stepSize;
+            break;
+        case VK_DOWN:
+            blueRectY += stepSize;
+            break;
+        }
+
+        // 충돌 검사
+        RECT blueRect = { blueRectX, blueRectY, blueRectX + blueRectWidth, blueRectY + blueRectHeight };
+        RECT pinkRect = { 50, 50, 150, 150 };
+        if (IntersectRect(&blueRect, &blueRect, &pinkRect)) {
+            showText = FALSE; // 충돌 시 텍스트 숨김
+        }
+        else {
+            showText = TRUE; // 충돌이 없을 때 텍스트 표시
+        }
+
+        // 윈도우를 다시 그리도록 요청
+        InvalidateRect(hwnd, NULL, TRUE);
+        return 0;
+    }
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
 }
-#ifdef UNICODE
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
-#else
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR pCmdLine, _In_ int nCmdShow)
-#endif
-{
-	/* 윈도우 클래스 선언.*/
-	WNDCLASS wc;
-	ZeroMemory(&wc, sizeof(wc));	// 모두 0으로 초기화.
 
-	// 윈도우 클래스 값 설정
-	wc.hInstance = hInstance;
-	wc.lpszClassName = TEXT("Computer Software");
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wc.hCursor = LoadCursor(NULL, IDC_CROSS);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = WindowProc;
+int main() {
+    // 윈도우 클래스 구조체 초기화
+    WNDCLASS wc = { 0 };
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = GetModuleHandle(NULL); // 현재 모듈의 핸들을 사용
+    wc.lpszClassName = L"SampleWindowClass";
 
-	// 윈도우 클래스 등록.
-	if (RegisterClass(&wc) == 0)
-	{
-		MessageBox(NULL, L"RegisterClass failed!", L"Error", MB_ICONERROR);
-		exit(-1);	//예외
-	}
+    // 윈도우 클래스 등록
+    RegisterClass(&wc);
 
-	// Window viewport 영역 조정
-	RECT rect = { 150, 100, 800, 600 };
-	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, 0);
-	int width = rect.right - rect.left;
-	int height = rect.bottom - rect.top;
+    // 윈도우 생성
+    HWND hwnd = CreateWindow(L"SampleWindowClass", L"202218016 김아름", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, 100, 100, 800, 600, NULL, NULL, GetModuleHandle(NULL), NULL);
 
-	// 윈도우 생성
-	HWND hwnd = CreateWindow(
-		wc.lpszClassName,
-		TEXT("202218016 김아름"),
-		WS_OVERLAPPEDWINDOW,
-		0, 0,
-		width, height,
-		NULL, NULL,
-		hInstance,
-		NULL
-	);
+    // 파란색 사각형의 초기 위치를 오른쪽 하단으로 설정
+    blueRectX = 700 - blueRectWidth;
+    blueRectY = 500 - blueRectHeight;
 
-	// 오류 검사.
-	if (hwnd == NULL)
-	{
-		MessageBox(NULL, L"CreateWindow failed!", L"Error", MB_ICONERROR);
-		exit(-1);
-	}
+    // 윈도우 표시
+    ShowWindow(hwnd, SW_SHOWDEFAULT); // SW_SHOWDEFAULT 사용
 
-	// 창 보이기.
-	ShowWindow(hwnd, SW_SHOW); // 창 띄우고
-	UpdateWindow(hwnd); // 업데이트해야 보임. 한 쌍으로 쓴다고 보면 됨.
+    // 메시지 루프
+    MSG msg = { 0 };
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
-
-
-	// 메시지 처리 루프.
-	MSG msg;
-	ZeroMemory(&msg, sizeof(msg));
-
-	// 메시지 처리.
-	while (msg.message != WM_QUIT)
-	{
-		if (GetMessage(&msg, NULL, 0, 0))
-		{
-			// 메시지 해석해줘.
-			TranslateMessage(&msg);
-			// 메시지를 처리해야할 곳에 전달해줘.
-			DispatchMessage(&msg);
-		}
-		//if(PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE))
-		//{
-		//	// 메시지 해석해줘.
-		//	TranslateMessage(&msg);
-		//	// 메시지를 처리해야할 곳에 전달해줘.
-		//	DispatchMessage(&msg);
-		//} // PM_REMOVE의 자리는 이 메세지를 쓰고 어떡할거냐.의 의미인데 지운다는 것임.
-		//else{}
-	}
-
-	UnregisterClass(wc.lpszClassName, wc.hInstance);
-
-	//종료 메시지 보내기
-	return (int)msg.wParam;
-
+    return 0;
 }
