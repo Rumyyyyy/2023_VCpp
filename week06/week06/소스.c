@@ -1,24 +1,26 @@
-#include <windows.h>
+#include <windows.h> // Window API 헤더 파일 포함, window 프로그래밍에 필요한 함수와 데이터 유형 사용 가능
 
 // 전역 변수로 사각형의 위치와 크기를 저장
-int blueRectX;
-int blueRectY;
+int blueRectX; // 파란색 사각형의 x좌표
+int blueRectY; // 파란색 사각형의 y좌표
 int blueRectWidth = 50; // 파란색 사각형의 너비
 int blueRectHeight = 50; // 파란색 사각형의 높이
 
 int textX; // 텍스트의 X 좌표
 int textY; // 텍스트의 Y 좌표
-BOOL showText = FALSE; // 첫 윈도우 화면에서 텍스트 숨김
+BOOL showText = FALSE; // 첫 윈도우 화면에서 텍스트 숨김: TRUE인 경우 텍스트 표시
 
+// 윈도우 프로시저 콜백함수 정의
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
-    case WM_CLOSE:
+    case WM_CLOSE: // 윈도우가 닫히는 메세지 발생 시 PostQuitMessage함수 호출 후 프로그램 종료 요청
         PostQuitMessage(0);
         return 0;
-    case WM_PAINT: {
+    case WM_PAINT: { // 그리기 작업
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
 
+        // 파란색 사각형의 잔상을 없애기 위함
         // 화면을 흰색으로 클리어
         HBRUSH whiteBrush = CreateSolidBrush(RGB(255, 255, 255)); // 흰색
         FillRect(hdc, &ps.rcPaint, whiteBrush);
@@ -36,7 +38,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         FillRect(hdc, &blueRect, blueBrush);
         DeleteObject(blueBrush);
 
-        if (showText) {
+        if (showText) { // 텍스트 표시
             // 텍스트 출력을 화면 중앙에 배치
             RECT textRect;
             GetClientRect(hwnd, &textRect); // 윈도우 클라이언트 영역 크기를 가져옴
@@ -44,15 +46,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             int textHeight = 20; // 텍스트 높이
             textX = (textRect.right - textRect.left - textWidth) / 2;
             textY = (textRect.bottom - textRect.top - textHeight) / 2;
+            SetTextColor(hdc, RGB(255, 0, 0)); // 텍스트 색상
             TextOut(hdc, textX, textY, L"HIT !", 5);
         }
 
         EndPaint(hwnd, &ps);
         return 0;
     }
-    case WM_KEYDOWN: {
+    case WM_KEYDOWN: { // 키보드 입력 처리
         int stepSize = 10;
-        switch (wParam) {
+        switch (wParam) { // 키보드 입력에 따른 파란색 사각형 위치 변경
         case VK_LEFT:
             blueRectX -= stepSize;
             break;
