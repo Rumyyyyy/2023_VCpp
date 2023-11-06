@@ -5,11 +5,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void DrawBonobono(HDC hdc, int centerX, int centerY, int size);
 
 HBRUSH hbrBackground;
+HWND hwndMain; // 메인 윈도우 핸들
 
 int bonobonoX, bonobonoY;
 int shapeSize = 500; // 초기 크기를 설정
-int shapeType = 0;
 bool spaceKeyPressed = false;
+bool drawBonobono = false; // 보노보노 그리기 여부
 
 int main() {
     // 윈도우 클래스를 등록합니다.
@@ -26,43 +27,22 @@ int main() {
         return 1;
     }
 
-    // 윈도우를 생성합니다.
-    HWND hwnd = CreateWindow(L"MyWindowClass", L"202218016 김아름", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, 100, 100, 1000, 800, NULL, NULL, GetModuleHandle(NULL), NULL);
+    // 메인 윈도우를 생성합니다.
+    hwndMain = CreateWindow(L"MyWindowClass", L"202218016 김아름", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, 100, 100, 1000, 800, NULL, NULL, GetModuleHandle(NULL), NULL);
 
-    if (!hwnd) {
+    if (!hwndMain) {
         return 2;
     }
 
-    RECT rect;
-    GetClientRect(hwnd, &rect);
-    int windowWidth = rect.right - rect.left;
-    int windowHeight = rect.bottom - rect.top;
-    bonobonoX = windowWidth / 2;
-    bonobonoY = windowHeight / 2;
-
-
-    // 버튼 1을 생성합니다. 
-    CreateWindow(L"BUTTON", L"Button1", WS_CHILD | WS_VISIBLE, 50, 50, 160, 64, hwnd, (HMENU)1, GetModuleHandle(NULL), NULL);
-
-    // 버튼 2를 생성합니다.
-    CreateWindow(L"BUTTON", L"Button2", WS_CHILD | WS_VISIBLE, 220, 50, 160, 64, hwnd, (HMENU)2, GetModuleHandle(NULL), NULL);
-
-    // 버튼 3을 생성합니다.
-    CreateWindow(L"BUTTON", L"Button3", WS_CHILD | WS_VISIBLE, 390, 50, 160, 64, hwnd, (HMENU)3, GetModuleHandle(NULL), NULL);
-
-    // 버튼 4를 생성합니다.
-    CreateWindow(L"BUTTON", L"Button4", WS_CHILD | WS_VISIBLE, 560, 50, 160, 64, hwnd, (HMENU)4, GetModuleHandle(NULL), NULL);
-
-    // 버튼 5를 생성합니다.
-    CreateWindow(L"BUTTON", L"Button5", WS_CHILD | WS_VISIBLE, 730, 50, 160, 64, hwnd, (HMENU)4, GetModuleHandle(NULL), NULL);
+    // 버튼을 생성합니다.
+    CreateWindow(L"BUTTON", L"Bonobono", WS_CHILD | WS_VISIBLE, 50, 50, 160, 64, hwndMain, (HMENU)1, GetModuleHandle(NULL), NULL);
+    CreateWindow(L"BUTTON", L"Button2", WS_CHILD | WS_VISIBLE, 220, 50, 160, 64, hwndMain, (HMENU)2, GetModuleHandle(NULL), NULL);
+    CreateWindow(L"BUTTON", L"Button3", WS_CHILD | WS_VISIBLE, 390, 50, 160, 64, hwndMain, (HMENU)3, GetModuleHandle(NULL), NULL);
+    CreateWindow(L"BUTTON", L"Button4", WS_CHILD | WS_VISIBLE, 560, 50, 160, 64, hwndMain, (HMENU)4, GetModuleHandle(NULL), NULL);
+    CreateWindow(L"BUTTON", L"Button5", WS_CHILD | WS_VISIBLE, 730, 50, 160, 64, hwndMain, (HMENU)5, GetModuleHandle(NULL), NULL);
 
     // 윈도우를 표시
-    ShowWindow(hwnd, SW_SHOW);
-
-    // 최초 그리기를 수행
-    HDC hdc = GetDC(hwnd);
-    DrawBonobono(hdc, bonobonoX, bonobonoY, shapeSize);
-    ReleaseDC(hwnd, hdc);
+    ShowWindow(hwndMain, SW_SHOW);
 
     // 메인 메시지 루프
     MSG msg;
@@ -77,6 +57,7 @@ int main() {
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     HDC hdc;
     PAINTSTRUCT ps;
+    RECT clientRect;
 
     switch (uMsg) {
     case WM_CREATE:
@@ -84,30 +65,55 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     case WM_CLOSE:
         PostQuitMessage(0);
         break;
-
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
-        DrawBonobono(hdc, bonobonoX, bonobonoY, shapeSize);
+        if (drawBonobono) {
+            GetClientRect(hwnd, &clientRect);
+            int centerX = (clientRect.right + clientRect.left) / 2;
+            int centerY = (clientRect.bottom + clientRect.top) / 2;
+            DrawBonobono(hdc, centerX, centerY, shapeSize);
+        }
         EndPaint(hwnd, &ps);
-        break;
-
-    case WM_LBUTTONUP:
-        InvalidateRect(hwnd, NULL, FALSE); // 화면 갱신
         break;
 
     case WM_KEYDOWN:
         if (wParam == VK_SPACE) {
-            spaceKeyPressed = true;
-            // Force a redraw to update the eyes to lines
-            InvalidateRect(hwnd, NULL, FALSE);
+            if (drawBonobono) {
+                spaceKeyPressed = true; // 스페이스바 눌림
+                // Force a redraw to update the eyes to lines or circles
+                InvalidateRect(hwnd, NULL, FALSE);
+            }
         }
         break;
 
     case WM_KEYUP:
         if (wParam == VK_SPACE) {
-            spaceKeyPressed = false;
-            // Force a redraw to update the eyes back to circles
+            if (drawBonobono) {
+                spaceKeyPressed = false; // 스페이스바 뗌
+                // Force a redraw to update the eyes back to circles
+                InvalidateRect(hwnd, NULL, FALSE);
+            }
+        }
+        break;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case 1: // 버튼 1을 클릭했을 때
+            // 버튼 1의 포커스를 해제합니다.
+            SetFocus(NULL);
+
+            // 스페이스바 이벤트를 시뮬레이트 (WM_KEYDOWN)
+            SendMessage(hwnd, WM_KEYDOWN, VK_SPACE, 0);
+
+            // 보노보노 윈도우에 포커스를 설정합니다.
+            SetFocus(hwnd);
+
+            spaceKeyPressed = false; // 스페이스 바 효과 비활성화
+            drawBonobono = true; // drawBonobono를 true로 설정
+            bonobonoX = bonobonoY = 0; // 보노보노 위치 초기화
+            // Force a redraw to display Bonobono
             InvalidateRect(hwnd, NULL, FALSE);
+            break;
         }
         break;
 
